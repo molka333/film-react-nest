@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { OrderRepository } from './order.repository';
 import { CreateOrderDto } from './dto/order.dto';
-import { FilmsRepository } from 'src/films/films.repository';
+import { FilmsRepository } from '../films/films.repository';
 
 @Injectable()
 export class OrderService {
@@ -22,7 +22,7 @@ export class OrderService {
         throw new NotFoundException(`Фильм с id ${ticket.film} не найден`);
       }
 
-      const session = film.schedule.find((s) => s.id === ticket.session);
+      const session = film.schedules.find((s) => s.id === ticket.session);
 
       if (!session) {
         throw new BadRequestException(`Сеанс ${ticket.session} не найден`);
@@ -30,11 +30,9 @@ export class OrderService {
 
       const seatLabel = `${ticket.row}:${ticket.seat}`;
 
-      if (session.taken.includes(seatLabel)) {
+      if (session.taken && session.taken.split(',').includes(seatLabel)) {
         throw new BadRequestException(`Место ${seatLabel} уже забронировано`);
       }
-      session.taken.push(seatLabel);
-      await film.save();
     }
 
     await this.orderRepository.saveOrder(createOrderDto);
