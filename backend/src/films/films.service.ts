@@ -7,7 +7,17 @@ export class FilmsService {
 
   async getAllFilms() {
     const films = await this.filmsRepository.findAll();
-    return { total: films.length, items: films };
+
+    return {
+      total: films.length,
+      items: films.map((film) => ({
+        ...film,
+        tags:
+          typeof film.tags === 'string'
+            ? film.tags.split(',').map((t) => t.trim())
+            : film.tags,
+      })),
+    };
   }
 
   async getSchedule(id: string) {
@@ -18,8 +28,14 @@ export class FilmsService {
     }
 
     return {
-      total: film.schedule.length,
-      items: film.schedule,
+      total: film.schedules.length,
+      items: film.schedules.map((schedule) => ({
+        ...schedule,
+        hall: String(schedule.hall),
+        taken: schedule.taken
+          ? schedule.taken.split(',').filter((seat) => seat.trim() !== '')
+          : [],
+      })),
     };
   }
 }
