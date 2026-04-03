@@ -15,6 +15,6 @@ RUN npm install --omit=dev
 # Копируем только собранный код из предыдущего этапа
 COPY --from=builder /app/dist ./dist
 # Если у тебя есть статика (картинки фильмов), ее тоже надо скопировать
-# COPY --from=builder /app/public ./public 
+COPY --from=builder /app/public ./public 
 
 CMD ["node", "dist/main.js"]
